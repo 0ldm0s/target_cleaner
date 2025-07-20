@@ -1,0 +1,8 @@
+[package]
+name = "target_cleaner"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+walkdir = "2.4"
+anyhow = "1.0"
