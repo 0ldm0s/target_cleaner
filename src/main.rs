@@ -2,6 +2,7 @@ use std::path::PathBuf;
 use std::io::{self, Write};
 use anyhow::{Context, Result};
 use walkdir::WalkDir;
+use indicatif::{ProgressBar, ProgressStyle};
 
 /// 清理Rust项目target目录的工具
 fn main() -> Result<()> {
@@ -33,6 +34,12 @@ fn find_target_dirs(root: &PathBuf) -> Result<Vec<PathBuf>> {
     let mut targets = Vec::new();
     let mut visited_dirs = std::collections::HashSet::new();
 
+    // 初始化进度条
+    let pb = ProgressBar::new_spinner();
+    pb.set_style(ProgressStyle::default_spinner()
+        .tick_strings(&["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"])
+        .template("{spinner} 扫描中: {msg}")?);
+
     for entry in WalkDir::new(root)
         .min_depth(1)
         .max_depth(10)
@@ -57,11 +64,15 @@ fn find_target_dirs(root: &PathBuf) -> Result<Vec<PathBuf>> {
         })
     {
         let entry = entry?;
+        pb.set_message(entry.path().display().to_string());
+        pb.tick();
+
         if entry.file_name() == "target" && entry.path().is_dir() {
             targets.push(entry.path().to_path_buf());
         }
     }
 
+    pb.finish_with_message("扫描完成");
     Ok(targets)
 }
 

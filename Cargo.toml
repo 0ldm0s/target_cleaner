@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 walkdir = "2.4"
 anyhow = "1.0"
+indicatif = "0.17"
